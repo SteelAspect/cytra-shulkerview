@@ -12,6 +12,9 @@ move and behave exactly like vanilla.
 
 Mixed shulkers get only the fill bar; empty shulkers get nothing.
 
+Placed labels are drawn on their own, so they also work with mods that render closed shulkers themselves
+(e.g. Optimized Block Entities). Test with one: `./gradlew runClientGameTest -PwithObe=<path to its jar>`.
+
 ## Server or client?
 
 One jar, install it on both for the full effect.

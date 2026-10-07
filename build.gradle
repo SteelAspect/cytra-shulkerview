@@ -14,6 +14,11 @@ dependencies {
     mappings loom.officialMojangMappings()
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+    // -PwithObe=<path to Optimized Block Entities jar>: test placed labels with a mod that draws closed shulkers itself
+    if (project.hasProperty('withObe')) {
+        modLocalRuntime files(project.property('withObe'))
+    }
 }
 
 // In-game client tests (src/gametest), run with ./gradlew runClientGameTest. Not part of the mod jar.

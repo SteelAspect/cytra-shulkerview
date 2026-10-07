@@ -7,5 +7,6 @@ public final class ShulkerViewClient implements ClientModInitializer {
     public void onInitializeClient() {
         ShulkerViewConfig.load();
         OpenedShulkerCache.register();
+        PlacedShulkerLabels.register();
     }
 }
