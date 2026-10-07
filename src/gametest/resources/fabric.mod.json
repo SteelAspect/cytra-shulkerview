@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "id": "cytra-shulkerview-test",
+  "version": "1.0.0",
+  "name": "Cytra Shulker View (client game tests)",
+  "authors": ["steelaspect"],
+  "environment": "client",
+  "entrypoints": {
+    "fabric-client-gametest": [
+      "dev.steelaspect.shulkerview.test.ShulkerViewClientGameTest"
+    ]
+  },
+  "depends": {
+    "cytra-shulkerview": "*"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "cytra-shulkerview",
+  "version": "${version}",
+  "name": "Cytra Shulker View",
+  "description": "Shows what's inside shulker boxes: an item icon when a shulker holds one item type, plus a fill bar. Works on shulker items and on placed shulkers. Purely visual.",
+  "authors": ["steelaspect"],
+  "contact": {
+    "sources": "https://github.com/SteelAspect/cytra-shulkerview",
+    "issues": "https://github.com/SteelAspect/cytra-shulkerview/issues"
+  },
+  "license": "All-Rights-Reserved",
+  "icon": "assets/cytra-shulkerview/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": ["dev.steelaspect.shulkerview.client.ShulkerViewClient"]
+  },
+  "mixins": [
+    "cytra-shulkerview.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.17.0",
+    "minecraft": "${minecraft_version}",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}

@@ -1,0 +1,1 @@
+[2026-10-07 07:50] FEATURE | 1.0.0: shulker item icon + fill bar, placed shulker side labels, server sync via block entity update tag, client-only fallback (remember opened shulkers), JSON config, client game test | all files | user testing in-game
