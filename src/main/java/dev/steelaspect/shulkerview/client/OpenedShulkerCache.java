@@ -54,7 +54,10 @@ public final class OpenedShulkerCache {
             ScreenEvents.remove(screen).register(closed -> CACHE.put(pos, summarize(shulkerScreen.getMenu())));
         });
         ClientPlayerBlockBreakEvents.AFTER.register((level, player, pos, state) -> CACHE.remove(pos));
-        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> CACHE.clear());
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+            CACHE.clear();
+            ShulkerSummary.serverSyncSeen = false;
+        });
     }
 
     private static ShulkerSummary summarize(ShulkerBoxMenu menu) {

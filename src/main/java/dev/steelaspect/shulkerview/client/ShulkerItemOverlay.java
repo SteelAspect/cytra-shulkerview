@@ -5,8 +5,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.ItemStack;
 
 public final class ShulkerItemOverlay {
-    private static final float ICON_SCALE = 0.625f; // 10px icon on the 16px slot
-
     private ShulkerItemOverlay() {}
 
     public static void render(GuiGraphics graphics, ItemStack stack, int x, int y) {
@@ -17,8 +15,11 @@ public final class ShulkerItemOverlay {
 
         if (config.itemIcon && summary.hasIcon()) {
             graphics.pose().pushMatrix();
-            graphics.pose().translate(x + 3, y + 2);
-            graphics.pose().scale(ICON_SCALE, ICON_SCALE);
+            // Centred, nudged up 1px so the bar stays readable underneath.
+            float scale = (float) config.itemIconSize;
+            float offset = 8f * (1f - scale);
+            graphics.pose().translate(x + offset, y + offset - 1f);
+            graphics.pose().scale(scale, scale);
             graphics.renderFakeItem(summary.icon(), 0, 0);
             graphics.pose().popMatrix();
         }

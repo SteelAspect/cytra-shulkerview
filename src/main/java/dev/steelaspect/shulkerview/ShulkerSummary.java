@@ -15,6 +15,9 @@ public record ShulkerSummary(ItemStack icon, float fill, boolean empty) {
     public static final String TAG_KEY = "cytra_shulkerview";
     public static final int SLOTS = 27;
 
+    /** Client: set once a synced summary arrives, i.e. the server has this mod. Reset on disconnect. */
+    public static volatile boolean serverSyncSeen;
+
     public static ShulkerSummary of(Iterable<ItemStack> stacks) {
         ItemStack first = ItemStack.EMPTY;
         boolean mixed = false;

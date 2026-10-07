@@ -64,5 +64,6 @@ public abstract class ShulkerBoxBlockEntityMixin extends RandomizableContainerBl
     private void cytra$readSummary(ValueInput input, CallbackInfo ci) {
         // Only client update tags carry this key; saved worlds never do, so on the server this just clears the cache.
         cytra$summary = input.child(ShulkerSummary.TAG_KEY).map(ShulkerSummary::fromInput).orElse(null);
+        if (cytra$summary != null) ShulkerSummary.serverSyncSeen = true;
     }
 }

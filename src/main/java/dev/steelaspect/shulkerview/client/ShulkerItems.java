@@ -20,8 +20,9 @@ final class ShulkerItems {
         return ShulkerSummary.of(contents.nonEmptyItems());
     }
 
-    /** Light blue while filling, green when completely full. */
+    /** Configured colours: filling (light blue by default) or full (green by default). Always opaque. */
     static int barColor(ShulkerSummary summary) {
-        return summary.isFull() ? 0xFF55FF55 : 0xFF55BBFF;
+        ShulkerViewConfig config = ShulkerViewConfig.INSTANCE;
+        return 0xFF000000 | (summary.isFull() ? config.fullBarColor : config.barColor);
     }
 }

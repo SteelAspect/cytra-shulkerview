@@ -6,7 +6,7 @@ move and behave exactly like vanilla.
 ## What it shows
 
 - **Shulker items** (inventory, hotbar, chests): a small icon of the item inside when every stack is the same
-  item (diamonds, spruce logs...), and a fill bar along the bottom. Light blue while filling, green when 100% full.
+  item (diamonds, spruce logs...), and a fill bar along the bottom. Light blue while filling, green when 100% full (colours can be changed).
 - **Placed shulkers**: the same icon and fill bar as a label on the four side faces (the faces around the lid),
   like an item frame. Faces turned away from you and shulkers further than 24 blocks are skipped.
 
@@ -32,6 +32,12 @@ One jar, install it on both for the full effect.
 | `itemBar` | `true` | Fill bar on shulker items |
 | `placedLabels` | `true` | Labels on placed shulkers |
 | `placedDistance` | `24` | Max label distance in blocks (1-128) |
+| `barColor` | light blue | Fill bar colour while filling (ARGB int) |
+| `fullBarColor` | green | Fill bar colour when 100% full (ARGB int) |
+| `itemIconSize` | `0.625` | Icon size on items, fraction of the slot (0.25-1) |
+| `placedIconSize` | `0.4` | Icon size on placed labels, fraction of the face (0.2-0.8) |
+
+All of these are also on the Shulker View page in Cytra Hub.
 
 ## Building
 

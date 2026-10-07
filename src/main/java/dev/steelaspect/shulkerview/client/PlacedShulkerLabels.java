@@ -31,7 +31,6 @@ public final class PlacedShulkerLabels {
     private static final RenderStateDataKey<Label> LABEL = RenderStateDataKey.create(() -> "cytra-shulkerview label");
 
     private static final float FACE_OFFSET = 0.5f + 0.02f;
-    private static final float ICON_SCALE = 0.4f;
     private static final float ICON_Y = 0.06f;
     private static final float BAR_HALF_WIDTH = 0.3f;
     private static final float BAR_TOP = -0.24f;
@@ -43,6 +42,7 @@ public final class PlacedShulkerLabels {
     static final class Label {
         final ItemStackRenderState item = new ItemStackRenderState();
         boolean hasIcon;
+        float iconScale;
         float fill;
         int barColor;
     }
@@ -64,6 +64,7 @@ public final class PlacedShulkerLabels {
         Label label = state.getData(LABEL);
         if (label == null) label = new Label();
         label.hasIcon = summary.hasIcon();
+        label.iconScale = (float) config.placedIconSize;
         label.fill = summary.fill();
         label.barColor = ShulkerItems.barColor(summary);
         if (label.hasIcon) {
@@ -112,7 +113,7 @@ public final class PlacedShulkerLabels {
         if (label.hasIcon) {
             poseStack.pushPose();
             poseStack.translate(0.0f, ICON_Y, 0.0f);
-            poseStack.scale(ICON_SCALE, ICON_SCALE, ICON_SCALE);
+            poseStack.scale(label.iconScale, label.iconScale, label.iconScale);
             label.item.submit(poseStack, collector, light, OverlayTexture.NO_OVERLAY, 0);
             poseStack.popPose();
         }

@@ -27,6 +27,14 @@ public final class ShulkerViewConfig {
     public boolean placedLabels = true;
     /** Placed labels are only drawn within this many blocks. */
     public int placedDistance = 24;
+    /** Fill bar colour while the shulker is filling (ARGB). */
+    public int barColor = 0xFF55BBFF;
+    /** Fill bar colour when the shulker is completely full (ARGB). */
+    public int fullBarColor = 0xFF55FF55;
+    /** Icon size on shulker items, as a fraction of the 16px slot. */
+    public double itemIconSize = 0.625;
+    /** Icon size on placed shulker labels, as a fraction of the block face. */
+    public double placedIconSize = 0.4;
 
     public static void load() {
         if (Files.exists(FILE)) {
@@ -38,6 +46,8 @@ public final class ShulkerViewConfig {
             }
         }
         INSTANCE.placedDistance = Math.max(1, Math.min(128, INSTANCE.placedDistance));
+        INSTANCE.itemIconSize = Math.max(0.25, Math.min(1.0, INSTANCE.itemIconSize));
+        INSTANCE.placedIconSize = Math.max(0.2, Math.min(0.8, INSTANCE.placedIconSize));
         save();
     }
 
