@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "cytra-shulkerview",
   "version": "${version}",
-  "name": "Cytra Shulker View",
+  "name": "Alloy Shulker View",
   "description": "Shows what's inside shulker boxes: an item icon when a shulker holds one item type, plus a fill bar. Works on shulker items and on placed shulkers. Purely visual.",
   "authors": ["steelaspect"],
   "contact": {

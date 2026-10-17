@@ -1,4 +1,4 @@
-# Cytra Shulker View
+# Alloy Shulker View
 
 Fabric mod for Minecraft 1.21.11 that shows what's inside shulker boxes. Purely visual: shulkers store,
 move and behave exactly like vanilla.
@@ -40,7 +40,7 @@ One jar, install it on both for the full effect.
 | `itemIconSize` | `0.625` | Icon size on items, fraction of the slot (0.25-1) |
 | `placedIconSize` | `0.4` | Icon size on placed labels, fraction of the face (0.2-0.8) |
 
-All of these are also on the Shulker View page in Cytra Hub.
+All of these are also on the Shulker View page in Alloy Hub.
 
 ## Building
 

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "cytra-shulkerview-test",
   "version": "1.0.0",
-  "name": "Cytra Shulker View (client game tests)",
+  "name": "Alloy Shulker View (client game tests)",
   "authors": ["steelaspect"],
   "environment": "client",
   "entrypoints": {
