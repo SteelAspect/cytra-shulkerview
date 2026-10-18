@@ -5,6 +5,8 @@ import dev.steelaspect.shulkerview.ShulkerSummaryHolder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -24,7 +26,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 /**
  * Server side: shulkers send a small summary (icon item + fill) to clients in their block entity update tag, which
  * vanilla already sends with chunks and on block entity updates. Vanilla clients ignore the extra key. Nothing about
- * how the shulker stores or moves items changes.
+ * how the shulker stores or moves items changes. The custom name rides along so named boxes can get their texture.
  * Client side: reads that summary back so the renderer can draw it.
  */
 @Mixin(ShulkerBoxBlockEntity.class)
@@ -52,6 +54,8 @@ public abstract class ShulkerBoxBlockEntityMixin extends RandomizableContainerBl
         ShulkerSummary summary = ShulkerSummary.of(getItems());
         cytra$summary = summary;
         tag.put(ShulkerSummary.TAG_KEY, summary.toTag(registries));
+        // The name too (vanilla's own key, so the client's loadAdditional reads it back), for named-box textures.
+        tag.storeNullable("CustomName", ComponentSerialization.CODEC, registries.createSerializationContext(NbtOps.INSTANCE), getCustomName());
         return tag;
     }
 

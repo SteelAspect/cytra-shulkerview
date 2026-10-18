@@ -18,10 +18,12 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * Fallback for servers without this mod: the client can't see inside placed shulkers, so remember what was in each
- * shulker the player opened (keyed by position, cleared on disconnect / when the player breaks it).
+ * shulker the player opened, and its name (keyed by position, cleared on disconnect / when the player breaks it).
  */
 public final class OpenedShulkerCache {
     private static final Map<BlockPos, ShulkerSummary> CACHE = new HashMap<>();
+    /** Screen titles of opened shulkers (their custom name, if any), for named-box textures. */
+    private static final Map<BlockPos, String> NAMES = new HashMap<>();
     private static final int OPEN_WINDOW_TICKS = 40;
 
     private static @Nullable BlockPos lastClicked;
@@ -31,6 +33,10 @@ public final class OpenedShulkerCache {
 
     public static @Nullable ShulkerSummary get(BlockPos pos) {
         return CACHE.get(pos);
+    }
+
+    public static @Nullable String getName(BlockPos pos) {
+        return NAMES.get(pos);
     }
 
     public static void register() {
@@ -50,12 +56,17 @@ public final class OpenedShulkerCache {
             }
             BlockPos pos = lastClicked;
             lastClicked = null;
+            NAMES.put(pos, screen.getTitle().getString());
             // Contents arrive a moment after the screen opens, so read them when it closes.
             ScreenEvents.remove(screen).register(closed -> CACHE.put(pos, summarize(shulkerScreen.getMenu())));
         });
-        ClientPlayerBlockBreakEvents.AFTER.register((level, player, pos, state) -> CACHE.remove(pos));
+        ClientPlayerBlockBreakEvents.AFTER.register((level, player, pos, state) -> {
+            CACHE.remove(pos);
+            NAMES.remove(pos);
+        });
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
             CACHE.clear();
+            NAMES.clear();
             ShulkerSummary.serverSyncSeen = false;
         });
     }

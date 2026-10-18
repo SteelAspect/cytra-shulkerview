@@ -20,6 +20,7 @@ public class ShulkerViewClientGameTest implements FabricClientGameTest {
 
     @Override
     public void runTest(ClientGameTestContext context) {
+        if (Boolean.getBoolean("shulkerview.namedOnly")) return;
         try (TestSingleplayerContext world = context.worldBuilder().create()) {
             world.getClientWorld().waitForChunksRender();
             world.getServer().runCommand("time set noon");

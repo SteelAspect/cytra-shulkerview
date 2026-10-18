@@ -35,6 +35,8 @@ public final class ShulkerViewConfig {
     public double itemIconSize = 0.625;
     /** Icon size on placed shulker labels, as a fraction of the block face. */
     public double placedIconSize = 0.4;
+    /** Placed shulkers named Trash / Tools / Food / Blocks use the Alloy Pack texture for that name (if the pack is on). */
+    public boolean namedTextures = true;
 
     public static void load() {
         if (Files.exists(FILE)) {

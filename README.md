@@ -12,6 +12,10 @@ move and behave exactly like vanilla.
 
 Mixed shulkers get only the fill bar; empty shulkers get nothing.
 
+- **Named shulkers** (with Alloy Pack on): placed shulkers named `Trash`, `Tools`, `Food` or `Blocks` (any case) use
+  the same texture Alloy Pack gives the item. Without the pack they look vanilla. With Optimized Block Entities these
+  boxes are drawn as normal block entities so the texture can show.
+
 Placed labels are drawn on their own, so they also work with mods that render closed shulkers themselves
 (e.g. Optimized Block Entities). Test with one: `./gradlew runClientGameTest -PwithObe=<path to its jar>`.
 
@@ -22,7 +26,8 @@ One jar, install it on both for the full effect.
 - **Server + client**: the server adds a tiny summary (icon item + fill) to each shulker's block entity data, so every
   placed shulker shows its label and updates live (players, hoppers, droppers). Vanilla clients ignore the extra data.
 - **Client only** (server without the mod): shulker items work fully. Placed shulkers show their label after you open
-  them once (remembered until you leave the server).
+  them once (remembered until you leave the server). Same for named-shulker textures: the client learns the name
+  from the shulker screen title when you open it.
 - **Server only**: harmless, nothing to see.
 
 ## Config
@@ -39,6 +44,7 @@ One jar, install it on both for the full effect.
 | `fullBarColor` | green | Fill bar colour when 100% full (ARGB int) |
 | `itemIconSize` | `0.625` | Icon size on items, fraction of the slot (0.25-1) |
 | `placedIconSize` | `0.4` | Icon size on placed labels, fraction of the face (0.2-0.8) |
+| `namedTextures` | `true` | Alloy Pack textures on placed shulkers named Trash / Tools / Food / Blocks |
 
 All of these are also on the Shulker View page in Alloy Hub.
 
@@ -46,3 +52,4 @@ All of these are also on the Shulker View page in Alloy Hub.
 
 Needs a Java 21 JDK: `./gradlew build` → `build/libs/cytra-shulkerview-<version>.jar`.
 `./gradlew runClientGameTest` runs the in-game test (places shulkers, checks sync, takes screenshots).
+Add `-PalloyPack=<Alloy Pack zip>` for the named-shulker test (`-PnamedOnly` runs just that one).

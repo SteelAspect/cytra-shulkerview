@@ -50,3 +50,15 @@ java {
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21
 }
+
+// Test games start muted. -PalloyPack=<Alloy Pack zip> runs the named shulker texture test; -PnamedOnly skips the rest.
+tasks.matching { it.name == 'runClientGameTest' }.configureEach {
+    if (project.hasProperty('alloyPack')) jvmArgs "-Dshulkerview.alloyPack=${file(project.property('alloyPack'))}"
+    if (project.hasProperty('namedOnly')) jvmArgs '-Dshulkerview.namedOnly=true'
+    doFirst {
+        def options = file('build/run/clientGameTest/options.txt')
+        options.parentFile.mkdirs()
+        def lines = options.exists() ? options.readLines().findAll { !it.startsWith('soundCategory_master:') } : []
+        options.text = (lines + 'soundCategory_master:0.0').join('\n') + '\n'
+    }
+}

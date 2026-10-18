@@ -9,7 +9,9 @@
     "ShulkerBoxBlockEntityMixin"
   ],
   "client": [
-    "client.GuiGraphicsMixin"
+    "client.GuiGraphicsMixin",
+    "client.ShulkerBoxRendererMixin",
+    "client.ShulkerBoxRenderStateMixin"
   ],
   "injectors": {
     "defaultRequire": 1
