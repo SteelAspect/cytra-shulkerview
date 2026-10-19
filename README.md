@@ -52,4 +52,6 @@ All of these are also on the Shulker View page in Alloy Hub.
 
 Needs a Java 21 JDK: `./gradlew build` → `build/libs/cytra-shulkerview-<version>.jar`.
 `./gradlew runClientGameTest` runs the in-game test (places shulkers, checks sync, takes screenshots).
-Add `-PalloyPack=<Alloy Pack zip>` for the named-shulker test (`-PnamedOnly` runs just that one).
+Add `-PalloyPack=<Alloy Pack zip>` for the named-shulker test (`-PnamedOnly` runs just that one). A test also plays a
+server without the mod (labels and named textures only after opening). `-PwithSbt=<ShulkerBoxTooltip jar>` runs the tests
+with ShulkerBoxTooltip loaded.

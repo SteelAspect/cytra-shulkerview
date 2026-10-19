@@ -8,7 +8,8 @@
   "entrypoints": {
     "fabric-client-gametest": [
       "dev.steelaspect.shulkerview.test.ShulkerViewClientGameTest",
-      "dev.steelaspect.shulkerview.test.NamedShulkerClientGameTest"
+      "dev.steelaspect.shulkerview.test.NamedShulkerClientGameTest",
+      "dev.steelaspect.shulkerview.test.VanillaServerClientGameTest"
     ]
   },
   "depends": {

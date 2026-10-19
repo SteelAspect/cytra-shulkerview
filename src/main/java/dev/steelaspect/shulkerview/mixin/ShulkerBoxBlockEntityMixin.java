@@ -51,6 +51,7 @@ public abstract class ShulkerBoxBlockEntityMixin extends RandomizableContainerBl
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag tag = super.getUpdateTag(registries);
+        if (ShulkerSummary.testVanillaServer) return tag;
         ShulkerSummary summary = ShulkerSummary.of(getItems());
         cytra$summary = summary;
         tag.put(ShulkerSummary.TAG_KEY, summary.toTag(registries));
@@ -61,6 +62,7 @@ public abstract class ShulkerBoxBlockEntityMixin extends RandomizableContainerBl
 
     @Override
     public @Nullable Packet<ClientGamePacketListener> getUpdatePacket() {
+        if (ShulkerSummary.testVanillaServer) return super.getUpdatePacket();
         return ClientboundBlockEntityDataPacket.create((BlockEntity) (Object) this);
     }
 

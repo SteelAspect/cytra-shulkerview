@@ -18,6 +18,9 @@ public record ShulkerSummary(ItemStack icon, float fill, boolean empty) {
     /** Client: set once a synced summary arrives, i.e. the server has this mod. Reset on disconnect. */
     public static volatile boolean serverSyncSeen;
 
+    /** Client game tests only: the integrated server acts like a vanilla one (sends no summary, name or update packets). */
+    public static volatile boolean testVanillaServer;
+
     public static ShulkerSummary of(Iterable<ItemStack> stacks) {
         ItemStack first = ItemStack.EMPTY;
         boolean mixed = false;
