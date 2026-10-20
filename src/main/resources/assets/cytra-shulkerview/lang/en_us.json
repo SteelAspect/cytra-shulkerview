@@ -1,0 +1,28 @@
+{
+  "key.category.cytra-shulkerview.main": "Alloy Shulker View",
+  "key.cytra-shulkerview.settings": "Open settings",
+
+  "cytra-shulkerview.settings.title": "Shulker View",
+
+  "cytra-shulkerview.option.section.items": "Shulker items",
+  "cytra-shulkerview.option.itemIcon": "Item icon",
+  "cytra-shulkerview.option.itemIcon.hint": "Shows the item inside when every stack is the same item",
+  "cytra-shulkerview.option.itemBar": "Fill bar",
+  "cytra-shulkerview.option.itemBar.hint": "A bar along the bottom of the slot showing how full the shulker is",
+  "cytra-shulkerview.option.itemIconSize": "Icon size",
+  "cytra-shulkerview.option.itemIconSize.hint": "Share of the slot the icon covers",
+
+  "cytra-shulkerview.option.section.placed": "Placed shulkers",
+  "cytra-shulkerview.option.placedLabels": "Labels",
+  "cytra-shulkerview.option.placedLabels.hint": "Icon and fill bar on the four side faces, like an item frame",
+  "cytra-shulkerview.option.placedDistance": "Label distance",
+  "cytra-shulkerview.option.placedDistance.hint": "Labels further away than this many blocks are not drawn",
+  "cytra-shulkerview.option.placedIconSize": "Icon size",
+  "cytra-shulkerview.option.placedIconSize.hint": "Share of the face the icon covers",
+  "cytra-shulkerview.option.namedTextures": "Named shulker textures",
+  "cytra-shulkerview.option.namedTextures.hint": "Uses Alloy Pack textures on placed shulkers named Trash, Tools, Food or Blocks",
+
+  "cytra-shulkerview.option.section.colors": "Fill bar colours",
+  "cytra-shulkerview.option.barColor": "While filling",
+  "cytra-shulkerview.option.fullBarColor": "When full"
+}

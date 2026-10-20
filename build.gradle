@@ -9,11 +9,24 @@ base {
     archivesName = project.archives_base_name
 }
 
+repositories {
+    maven { name = 'TerraformersMC'; url = 'https://maven.terraformersmc.com/releases/' }
+    // Alloy UI (shared Nocturne theme + widgets): ./gradlew publishToMavenLocal in ../alloy-ui
+    mavenLocal { content { includeModule 'dev.steelaspect', 'alloy-ui' } }
+}
+
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings loom.officialMojangMappings()
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+    // Alloy UI, bundled inside the jar (jar-in-jar). Client code only (the settings screen).
+    modImplementation "dev.steelaspect:alloy-ui:${project.alloyui_version}"
+    include "dev.steelaspect:alloy-ui:${project.alloyui_version}"
+
+    // Optional: Mod Menu's config button opens the settings screen.
+    modCompileOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
 
     // -PwithObe=<path to Optimized Block Entities jar>: test placed labels with a mod that draws closed shulkers itself
     if (project.hasProperty('withObe')) {

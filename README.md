@@ -46,7 +46,9 @@ One jar, install it on both for the full effect.
 | `placedIconSize` | `0.4` | Icon size on placed labels, fraction of the face (0.2-0.8) |
 | `namedTextures` | `true` | Alloy Pack textures on placed shulkers named Trash / Tools / Food / Blocks |
 
-All of these are also on the Shulker View page in Alloy Hub.
+All of these are also in the mod's own settings screen (Mod Menu's config button, or bind "Open settings" under
+Controls → Alloy Shulker View; no key by default) and on the Shulker View page in Alloy Hub. The screen uses Alloy UI
+(bundled inside the jar), so it follows the theme picked in the Hub.
 
 ## Building
 
