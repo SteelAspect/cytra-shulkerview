@@ -19,10 +19,11 @@ public class SettingsScreenClientGameTest implements FabricClientGameTest {
     private static final Logger LOG = LoggerFactory.getLogger("ShulkerViewTest");
     private static final int SCALE = 2;
     private static final String[] IDS = {"itemIcon", "itemBar", "itemIconSize", "placedLabels", "placedDistance",
-            "placedIconSize", "namedTextures", "barColor", "fullBarColor"};
+            "placedIconSize", "namedTextures", "tooltipPreview", "tooltipShiftOnly", "tooltipCompact", "barColor", "fullBarColor"};
 
     @Override
     public void runTest(ClientGameTestContext context) {
+        if (Only.skip("settings")) return;
         if (Boolean.getBoolean("shulkerview.namedOnly")) return;
         context.getInput().resizeWindow(1280, 720);
         context.runOnClient(c -> {

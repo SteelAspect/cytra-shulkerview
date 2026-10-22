@@ -28,6 +28,7 @@ public class NamedShulkerClientGameTest implements FabricClientGameTest {
 
     @Override
     public void runTest(ClientGameTestContext context) {
+        if (Only.skip("named")) return;
         String packPath = System.getProperty("shulkerview.alloyPack");
         if (packPath == null) {
             LOG.info("No -PalloyPack, named shulker test skipped");

@@ -72,6 +72,8 @@ java {
 tasks.matching { it.name == 'runClientGameTest' }.configureEach {
     if (project.hasProperty('alloyPack')) jvmArgs "-Dshulkerview.alloyPack=${file(project.property('alloyPack'))}"
     if (project.hasProperty('namedOnly')) jvmArgs '-Dshulkerview.namedOnly=true'
+    // -Ponly=preview|settings|view|named|vanilla runs one test
+    if (project.hasProperty('only')) jvmArgs "-Dshulkerview.only=${project.property('only')}"
     doFirst {
         def options = file('build/run/clientGameTest/options.txt')
         options.parentFile.mkdirs()

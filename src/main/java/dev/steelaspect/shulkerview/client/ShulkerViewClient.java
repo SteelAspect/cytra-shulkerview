@@ -20,6 +20,7 @@ public final class ShulkerViewClient implements ClientModInitializer {
         OpenedShulkerCache.register();
         PlacedShulkerLabels.register();
         NamedShulkerTextures.register();
+        dev.steelaspect.shulkerview.client.preview.ShulkerPreview.register();
         KeyBindingHelper.registerKeyBinding(SETTINGS);
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (SETTINGS.consumeClick()) {

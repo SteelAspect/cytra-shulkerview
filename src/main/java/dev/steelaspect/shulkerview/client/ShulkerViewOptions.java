@@ -1,6 +1,8 @@
 package dev.steelaspect.shulkerview.client;
 
 import dev.steelaspect.alloyui.widget.Options;
+import dev.steelaspect.shulkerview.client.preview.ShulkerPreview;
+import net.minecraft.network.chat.Component;
 
 /**
  * Every setting in one Alloy UI {@link Options} list, for the settings screen. Getters go through
@@ -16,6 +18,13 @@ public final class ShulkerViewOptions {
                 .toggle("itemBar", () -> c().itemBar, v -> c().itemBar = v, true).onChange(ShulkerViewConfig::save)
                 .slider("itemIconSize", 0.25, 1.0, 0.05, () -> c().itemIconSize, v -> c().itemIconSize = v, 0.625)
                 .onChange(ShulkerViewConfig::save);
+        o.section("section.tooltip")
+                .toggle("tooltipPreview", () -> c().tooltipPreview, v -> c().tooltipPreview = v, true).onChange(ShulkerViewConfig::save)
+                .disabledWhen(ShulkerPreview::otherModPreviews, Component.translatable("cytra-shulkerview.option.tooltipPreview.other"))
+                .toggle("tooltipShiftOnly", () -> c().tooltipShiftOnly, v -> c().tooltipShiftOnly = v, false).onChange(ShulkerViewConfig::save)
+                .disabledWhen(() -> ShulkerPreview.otherModPreviews() || !c().tooltipPreview, Component.translatable("cytra-shulkerview.option.tooltipPreview.off"))
+                .toggle("tooltipCompact", () -> c().tooltipCompact, v -> c().tooltipCompact = v, false).onChange(ShulkerViewConfig::save)
+                .disabledWhen(() -> ShulkerPreview.otherModPreviews() || !c().tooltipPreview, Component.translatable("cytra-shulkerview.option.tooltipPreview.off"));
         o.section("section.placed")
                 .toggle("placedLabels", () -> c().placedLabels, v -> c().placedLabels = v, true).onChange(ShulkerViewConfig::save)
                 .number("placedDistance", 1, 128, 1, true, () -> c().placedDistance, v -> c().placedDistance = v.intValue(), 24)

@@ -37,6 +37,12 @@ public final class ShulkerViewConfig {
     public double placedIconSize = 0.4;
     /** Placed shulkers named Trash / Tools / Food / Blocks use the Alloy Pack texture for that name (if the pack is on). */
     public boolean namedTextures = true;
+    /** Hovering a shulker item shows its 27 slots as a grid instead of vanilla's text list. */
+    public boolean tooltipPreview = true;
+    /** The grid only while Shift is held (vanilla's list otherwise). */
+    public boolean tooltipShiftOnly = false;
+    /** The grid merges same items into one slot with the total, most first. */
+    public boolean tooltipCompact = false;
 
     public static void load() {
         if (Files.exists(FILE)) {

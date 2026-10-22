@@ -31,6 +31,7 @@ public class VanillaServerClientGameTest implements FabricClientGameTest {
 
     @Override
     public void runTest(ClientGameTestContext context) {
+        if (Only.skip("vanilla")) return;
         String packPath = System.getProperty("shulkerview.alloyPack");
         if (Boolean.getBoolean("shulkerview.namedOnly") && packPath == null) return;
         String packId = packPath == null ? null : "file/" + Path.of(packPath).getFileName();

@@ -10,6 +10,8 @@
   ],
   "client": [
     "client.GuiGraphicsMixin",
+    "client.ItemStackTooltipMixin",
+    "client.ItemTooltipImageMixin",
     "client.ShulkerBoxRendererMixin",
     "client.ShulkerBoxRenderStateMixin"
   ],
