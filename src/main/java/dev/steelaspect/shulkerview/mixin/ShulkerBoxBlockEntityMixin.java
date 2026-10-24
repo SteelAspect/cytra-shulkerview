@@ -3,10 +3,8 @@ package dev.steelaspect.shulkerview.mixin;
 import dev.steelaspect.shulkerview.ShulkerSummary;
 import dev.steelaspect.shulkerview.ShulkerSummaryHolder;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -15,7 +13,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.ValueInput;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -49,27 +46,27 @@ public abstract class ShulkerBoxBlockEntityMixin extends RandomizableContainerBl
     }
 
     @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        CompoundTag tag = super.getUpdateTag(registries);
-        if (ShulkerSummary.testVanillaServer) return tag;
+    public CompoundTag getUpdateTag() {
+        CompoundTag tag = super.getUpdateTag();
         ShulkerSummary summary = ShulkerSummary.of(getItems());
         cytra$summary = summary;
-        tag.put(ShulkerSummary.TAG_KEY, summary.toTag(registries));
-        // The name too (vanilla's own key, so the client's loadAdditional reads it back), for named-box textures.
-        tag.storeNullable("CustomName", ComponentSerialization.CODEC, registries.createSerializationContext(NbtOps.INSTANCE), getCustomName());
+        tag.put(ShulkerSummary.TAG_KEY, summary.toTag());
+        // The name too (vanilla's own key, so the client's load reads it back), for named-box textures.
+        Component name = getCustomName();
+        if (name != null) tag.putString("CustomName", Component.Serializer.toJson(name));
         return tag;
     }
 
     @Override
     public @Nullable Packet<ClientGamePacketListener> getUpdatePacket() {
-        if (ShulkerSummary.testVanillaServer) return super.getUpdatePacket();
         return ClientboundBlockEntityDataPacket.create((BlockEntity) (Object) this);
     }
 
-    @Inject(method = "loadAdditional", at = @At("TAIL"))
-    private void cytra$readSummary(ValueInput input, CallbackInfo ci) {
+    @Inject(method = "load", at = @At("TAIL"))
+    private void cytra$readSummary(CompoundTag tag, CallbackInfo ci) {
         // Only client update tags carry this key; saved worlds never do, so on the server this just clears the cache.
-        cytra$summary = input.child(ShulkerSummary.TAG_KEY).map(ShulkerSummary::fromInput).orElse(null);
+        cytra$summary = tag.contains(ShulkerSummary.TAG_KEY, CompoundTag.TAG_COMPOUND)
+                ? ShulkerSummary.fromTag(tag.getCompound(ShulkerSummary.TAG_KEY)) : null;
         if (cytra$summary != null) ShulkerSummary.serverSyncSeen = true;
     }
 }

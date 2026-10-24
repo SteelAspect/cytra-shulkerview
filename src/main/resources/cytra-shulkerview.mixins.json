@@ -2,7 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "package": "dev.steelaspect.shulkerview.mixin",
-  "compatibilityLevel": "JAVA_21",
+  "compatibilityLevel": "JAVA_17",
   "mixins": [
     "BlockEntityMixin",
     "ContainerItemsAccessor",
@@ -10,10 +10,9 @@
   ],
   "client": [
     "client.GuiGraphicsMixin",
-    "client.ItemStackTooltipMixin",
-    "client.ItemTooltipImageMixin",
-    "client.ShulkerBoxRendererMixin",
-    "client.ShulkerBoxRenderStateMixin"
+    "client.ItemStackTooltipImageMixin",
+    "client.ShulkerBoxBlockTooltipMixin",
+    "client.ShulkerBoxRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

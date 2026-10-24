@@ -7,21 +7,39 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * What the tooltip preview shows: the stacks in slot order (EMPTY for free slots), or merged totals in compact mode,
- * and the shulker's colour. Built once per shulker contents and reused every frame, with its client component.
+ * the grid width and the window colour. Built once per contents and view, reused every frame with its client component.
  */
 public final class ShulkerPreviewData implements TooltipComponent {
-    /** Normal: 27 entries, one per slot. Compact: one per item type, most first. */
+    /** Full: one entry per slot. Compact: one per item type, most first. */
     final List<ItemStack> stacks;
     /** Compact mode only: the merged count of each entry. */
     final int @Nullable [] totals;
-    /** ARGB tint, from the shulker's dye colour. */
-    final int tint;
+    final int columns;
+    /** ARGB colour the window takes (a shulker's dye colour), or null for plain Nocturne. */
+    final @Nullable Integer tint;
     @Nullable ClientShulkerPreview client;
 
-    ShulkerPreviewData(List<ItemStack> stacks, int @Nullable [] totals, int tint) {
+    ShulkerPreviewData(List<ItemStack> stacks, int @Nullable [] totals, int columns, @Nullable Integer tint) {
         this.stacks = stacks;
         this.totals = totals;
+        this.columns = columns;
         this.tint = tint;
+    }
+
+    public boolean compact() {
+        return totals != null;
+    }
+
+    public int size() {
+        return stacks.size();
+    }
+
+    public int columns() {
+        return columns;
+    }
+
+    public @Nullable Integer tint() {
+        return tint;
     }
 
     ClientShulkerPreview client() {

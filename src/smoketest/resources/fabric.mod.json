@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "cytra-shulkerview-smoke",
+  "version": "1.0.0",
+  "name": "Alloy Shulker View (1.20.4 smoke test)",
+  "authors": ["steelaspect"],
+  "environment": "client",
+  "entrypoints": {
+    "client": ["dev.steelaspect.shulkerview.smoke.ShulkerSmokeTest"]
+  },
+  "depends": {
+    "cytra-shulkerview": "*"
+  }
+}

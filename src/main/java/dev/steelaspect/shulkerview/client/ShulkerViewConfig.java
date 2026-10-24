@@ -19,7 +19,7 @@ public final class ShulkerViewConfig {
 
     public static ShulkerViewConfig INSTANCE = new ShulkerViewConfig();
 
-    /** Item icon on shulker items in inventories/hotbar when every stack inside is the same item. */
+    /** Item icon on shulker (and other container) items in inventories/hotbar when every stack inside is the same item. */
     public boolean itemIcon = true;
     /** Fill bar on shulker items. */
     public boolean itemBar = true;
@@ -37,12 +37,31 @@ public final class ShulkerViewConfig {
     public double placedIconSize = 0.4;
     /** Placed shulkers named Trash / Tools / Food / Blocks use the Alloy Pack texture for that name (if the pack is on). */
     public boolean namedTextures = true;
-    /** Hovering a shulker item shows its 27 slots as a grid instead of vanilla's text list. */
+    /** Hovering a container item shows its contents as a grid instead of vanilla's text list. */
     public boolean tooltipPreview = true;
-    /** The grid only while Shift is held (vanilla's list otherwise). */
-    public boolean tooltipShiftOnly = false;
-    /** The grid merges same items into one slot with the total, most first. */
-    public boolean tooltipCompact = false;
+    /**
+     * Key style. Off (Alloy): the preview always shows on hover, the preview key switches to the other view.
+     * On (ShulkerBoxTooltip style): a hint line on hover, preview key = compact, preview key + full key = full.
+     */
+    public boolean tooltipSbtKeys = false;
+    /**
+     * Preview keys, as key names ({@code key.keyboard.left.shift}). Kept here and not as vanilla key mappings: on
+     * 1.20.4 a key can drive only one mapping, so a second one on Shift would take it away from Sneak.
+     */
+    public String previewKey = "key.keyboard.left.shift";
+    public String fullPreviewKey = "key.keyboard.left.alt";
+    /** The view shown first is the full slot grid instead of the compact one (the key then switches to compact). */
+    public boolean tooltipFullByDefault = false;
+    /** The preview window takes the shulker box's dye colour (otherwise Nocturne's own colours). */
+    public boolean tooltipColored = true;
+    /** A "Loot table: ..." line on unopened loot containers. */
+    public boolean tooltipLootTable = false;
+    /** Icon, fill bar and preview for chests, barrels, hoppers, furnaces... (and modded containers) carrying items. */
+    public boolean otherContainers = true;
+    /** Icon and preview for bundles. */
+    public boolean bundles = true;
+    /** Preview of the player's ender chest on ender chest items (live when the server has this mod). */
+    public boolean enderChestPreview = true;
 
     public static void load() {
         if (Files.exists(FILE)) {

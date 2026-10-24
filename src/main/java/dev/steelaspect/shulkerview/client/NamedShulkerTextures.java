@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.WeakHashMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
@@ -14,11 +13,11 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraft.world.level.chunk.status.ChunkStatus;
+import net.minecraft.world.level.chunk.ChunkStatus;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +51,7 @@ public final class NamedShulkerTextures {
     private NamedShulkerTextures() {}
 
     private static Material material(String name) {
-        return Sheets.SHULKER_MAPPER.apply(Identifier.fromNamespaceAndPath("alloy", name));
+        return new Material(Sheets.SHULKER_SHEET, new ResourceLocation("alloy", "entity/shulker/" + name));
     }
 
     /** Texture for this placed shulker, or null for vanilla. */
@@ -64,7 +63,7 @@ public final class NamedShulkerTextures {
         Material material = MATERIALS.get(text.trim().toLowerCase(Locale.ROOT));
         if (material == null) return null;
         // Not in the atlas (Alloy Pack off) -> the atlas' missing sprite.
-        TextureAtlasSprite sprite = Minecraft.getInstance().getAtlasManager().get(material);
+        TextureAtlasSprite sprite = material.sprite();
         return !sprite.contents().name().equals(MissingTextureAtlasSprite.getLocation()) ? material : null;
     }
 

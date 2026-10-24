@@ -6,24 +6,25 @@ import dev.steelaspect.alloyui.theme.ThemeManager;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * The 9-wide slot grid drawn inside the tooltip: a Nocturne panel tinted with the shulker's colour, each slot with its
- * item, count, durability bar and glint (the vanilla item renderer). Compact mode shows merged totals.
+ * The slot grid drawn inside the tooltip: a Nocturne panel (in the shulker's colour when it has one), each slot with
+ * its item, count, durability bar and glint (the vanilla item renderer). Compact mode shows merged totals.
  */
 final class ClientShulkerPreview implements ClientTooltipComponent {
-    private static final int COLS = 9, SLOT = 18, PAD = 4, MARGIN_TOP = 2;
+    private static final int SLOT = 18, PAD = 4, MARGIN_TOP = 2;
 
     private final ShulkerPreviewData data;
-    private final int rows;
+    private final int cols, rows;
     /** Count text per compact entry (null = let vanilla draw the count). Built once. */
     private final String[] counts;
 
     ClientShulkerPreview(ShulkerPreviewData data) {
         this.data = data;
-        this.rows = Math.max(1, (data.stacks.size() + COLS - 1) / COLS);
+        this.cols = Math.max(1, data.columns);
+        this.rows = Math.max(1, (data.stacks.size() + cols - 1) / cols);
         this.counts = new String[data.stacks.size()];
         if (data.totals != null) {
             for (int i = 0; i < counts.length; i++) counts[i] = data.totals[i] > 1 ? shortCount(data.totals[i]) : null;
@@ -37,31 +38,35 @@ final class ClientShulkerPreview implements ClientTooltipComponent {
     }
 
     @Override
-    public int getHeight(Font font) {
+    public int getHeight() {
         return MARGIN_TOP + rows * SLOT + 2 * PAD;
     }
 
     @Override
     public int getWidth(Font font) {
-        return COLS * SLOT + 2 * PAD;
+        return cols * SLOT + 2 * PAD;
     }
 
     @Override
-    public void renderImage(Font font, int x, int y, int width, int height, GuiGraphics g) {
+    public void renderImage(Font font, int x, int y, GuiGraphics g) {
         Theme t = ThemeManager.get();
         int top = y + MARGIN_TOP;
         int w = getWidth(font), h = rows * SLOT + 2 * PAD;
-        int panel = ARGB.srgbLerp(0.28f, t.color("surface"), data.tint) | 0xFF000000;
-        int slot = ARGB.srgbLerp(0.18f, t.color("bg"), data.tint) | 0xFF000000;
+        int panel = t.color("surface") | 0xFF000000;
+        int slot = t.color("bg") | 0xFF000000;
+        if (data.tint != null) {
+            panel = FastColor.ARGB32.lerp(0.55f, panel, data.tint) | 0xFF000000;
+            slot = FastColor.ARGB32.lerp(0.35f, slot, data.tint) | 0xFF000000;
+        }
         Draw.panel(g, x, top, w, h, t.metricF("radius"), panel, t.color("border"), t.metricF("borderWidth"));
-        for (int i = 0; i < rows * COLS; i++) {
-            int sx = x + PAD + (i % COLS) * SLOT, sy = top + PAD + (i / COLS) * SLOT;
+        for (int i = 0; i < data.stacks.size(); i++) {
+            int sx = x + PAD + (i % cols) * SLOT, sy = top + PAD + (i / cols) * SLOT;
             g.fill(sx + 1, sy + 1, sx + SLOT - 1, sy + SLOT - 1, slot);
         }
         for (int i = 0; i < data.stacks.size(); i++) {
             ItemStack stack = data.stacks.get(i);
             if (stack.isEmpty()) continue;
-            int sx = x + PAD + (i % COLS) * SLOT + 1, sy = top + PAD + (i / COLS) * SLOT + 1;
+            int sx = x + PAD + (i % cols) * SLOT + 1, sy = top + PAD + (i / cols) * SLOT + 1;
             g.renderItem(stack, sx, sy);
             g.renderItemDecorations(font, stack, sx, sy, counts[i]);
         }

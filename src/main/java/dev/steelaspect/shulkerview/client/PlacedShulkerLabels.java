@@ -9,15 +9,14 @@ import java.util.ArrayList;
 import java.util.List;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldExtractionContext;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.item.ItemStackRenderState;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -25,8 +24,8 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
+import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
@@ -62,7 +61,7 @@ public final class PlacedShulkerLabels {
     private PlacedShulkerLabels() {}
 
     static final class Label {
-        final ItemStackRenderState item = new ItemStackRenderState();
+        net.minecraft.world.item.ItemStack icon = net.minecraft.world.item.ItemStack.EMPTY;
         BlockPos pos = BlockPos.ZERO;
         Direction facing = Direction.UP;
         boolean hasIcon;
@@ -87,8 +86,10 @@ public final class PlacedShulkerLabels {
             NEARBY.clear();
             labelCount = 0;
         });
-        WorldRenderEvents.END_EXTRACTION.register(PlacedShulkerLabels::extract);
-        WorldRenderEvents.BEFORE_ENTITIES.register(PlacedShulkerLabels::submit);
+        WorldRenderEvents.AFTER_ENTITIES.register(context -> {
+            collect(context);
+            draw(context);
+        });
     }
 
     private static void scan(ClientLevel level, Vec3 around) {
@@ -114,17 +115,18 @@ public final class PlacedShulkerLabels {
         }
     }
 
-    private static void extract(WorldExtractionContext context) {
+    private static void collect(WorldRenderContext context) {
         labelCount = 0;
         ShulkerViewConfig config = ShulkerViewConfig.INSTANCE;
         if (!config.placedLabels || NEARBY.isEmpty()) return;
         ClientLevel level = context.world();
-        cameraPos = context.camera().position();
+        cameraPos = context.camera().getPosition();
+        Frustum frustum = context.frustum();
         double maxSq = (double) config.placedDistance * config.placedDistance;
         for (BlockPos pos : NEARBY) {
             if (pos.getCenter().distanceToSqr(cameraPos) > maxSq) continue;
             if (!(level.getBlockEntity(pos) instanceof ShulkerBoxBlockEntity shulker)) continue;
-            if (!context.frustum().isVisible(new AABB(pos).inflate(0.1))) continue;
+            if (frustum != null && !frustum.isVisible(new AABB(pos).inflate(0.1))) continue;
             ShulkerSummary summary = ((ShulkerSummaryHolder) shulker).cytra$getSummary();
             if (summary == null) summary = OpenedShulkerCache.get(pos);
             if (summary == null || summary.empty()) continue;
@@ -132,7 +134,7 @@ public final class PlacedShulkerLabels {
             if (labelCount == LABELS.size()) LABELS.add(new Label());
             Label label = LABELS.get(labelCount++);
             label.pos = pos;
-            label.facing = shulker.getBlockState().getValueOrElse(ShulkerBoxBlock.FACING, Direction.UP);
+            label.facing = shulker.getBlockState().getOptionalValue(ShulkerBoxBlock.FACING).orElse(Direction.UP);
             label.hasIcon = summary.hasIcon();
             label.iconScale = (float) config.placedIconSize;
             label.fill = summary.fill();
@@ -141,19 +143,15 @@ public final class PlacedShulkerLabels {
                 // Light where the label is: in front of the face (the shulker block itself is dark inside).
                 label.faceLight[face.ordinal()] = LevelRenderer.getLightColor(level, pos.relative(face));
             }
-            if (label.hasIcon) {
-                Minecraft.getInstance().getItemModelResolver()
-                        .updateForTopItem(label.item, summary.icon(), ItemDisplayContext.FIXED, level, null, (int) pos.asLong());
-            } else {
-                label.item.clear();
-            }
+            label.icon = summary.icon();
         }
     }
 
-    private static void submit(WorldRenderContext context) {
-        if (labelCount == 0) return;
-        PoseStack poseStack = context.matrices();
-        SubmitNodeCollector collector = context.commandQueue();
+    private static void draw(WorldRenderContext context) {
+        if (labelCount == 0 || context.consumers() == null) return;
+        PoseStack poseStack = context.matrixStack();
+        MultiBufferSource buffers = context.consumers();
+        ClientLevel level = context.world();
         for (int i = 0; i < labelCount; i++) {
             Label label = LABELS.get(i);
             Vec3 center = label.pos.getCenter();
@@ -164,13 +162,13 @@ public final class PlacedShulkerLabels {
                 if (face.getAxis() == label.facing.getAxis()) continue;
                 // Skip faces turned away from the camera.
                 if (toCamera.x * face.getStepX() + toCamera.y * face.getStepY() + toCamera.z * face.getStepZ() <= 0.5) continue;
-                submitFace(label, face, label.faceLight[face.ordinal()], poseStack, collector);
+                drawFace(label, face, label.faceLight[face.ordinal()], poseStack, buffers, level);
             }
             poseStack.popPose();
         }
     }
 
-    private static void submitFace(Label label, Direction face, int light, PoseStack poseStack, SubmitNodeCollector collector) {
+    private static void drawFace(Label label, Direction face, int light, PoseStack poseStack, MultiBufferSource buffers, ClientLevel level) {
         poseStack.pushPose();
         poseStack.translate(0.5f + face.getStepX() * FACE_OFFSET, 0.5f + face.getStepY() * FACE_OFFSET, 0.5f + face.getStepZ() * FACE_OFFSET);
 
@@ -193,14 +191,16 @@ public final class PlacedShulkerLabels {
             poseStack.pushPose();
             poseStack.translate(0.0f, ICON_Y, 0.0f);
             poseStack.scale(label.iconScale, label.iconScale, label.iconScale);
-            label.item.submit(poseStack, collector, light, OverlayTexture.NO_OVERLAY, 0);
+            Minecraft.getInstance().getItemRenderer().renderStatic(label.icon, ItemDisplayContext.FIXED, light,
+                    OverlayTexture.NO_OVERLAY, poseStack, buffers, level, (int) label.pos.asLong());
             poseStack.popPose();
         }
 
         float fill = label.fill;
         int color = label.barColor;
-        collector.submitCustomGeometry(poseStack, RenderTypes.textBackground(), (pose, consumer) -> {
-            Matrix4f matrix = pose.pose();
+        {
+            VertexConsumer consumer = buffers.getBuffer(RenderType.textBackground());
+            Matrix4f matrix = poseStack.last().pose();
             float left = -BAR_HALF_WIDTH;
             float right = BAR_HALF_WIDTH;
             float top = BAR_TOP;
@@ -209,20 +209,20 @@ public final class PlacedShulkerLabels {
             // Local +X is the viewer's left here, so the bar grows from +X toward -X to read left-to-right.
             float fillEnd = right - (right - left) * Math.max(0.03f, fill);
             quad(consumer, matrix, fillEnd, top, right, bottom, -0.002f, color, light);
-        });
+        }
         poseStack.popPose();
     }
 
     /** Both windings so the bar shows whichever way the face's local axes ended up. */
     private static void quad(VertexConsumer consumer, Matrix4f matrix, float x1, float y1, float x2, float y2, float z, int argb, int light) {
-        consumer.addVertex(matrix, x1, y1, z).setColor(argb).setLight(light);
-        consumer.addVertex(matrix, x1, y2, z).setColor(argb).setLight(light);
-        consumer.addVertex(matrix, x2, y2, z).setColor(argb).setLight(light);
-        consumer.addVertex(matrix, x2, y1, z).setColor(argb).setLight(light);
+        consumer.vertex(matrix, x1, y1, z).color(argb).uv2(light).endVertex();
+        consumer.vertex(matrix, x1, y2, z).color(argb).uv2(light).endVertex();
+        consumer.vertex(matrix, x2, y2, z).color(argb).uv2(light).endVertex();
+        consumer.vertex(matrix, x2, y1, z).color(argb).uv2(light).endVertex();
 
-        consumer.addVertex(matrix, x1, y1, z).setColor(argb).setLight(light);
-        consumer.addVertex(matrix, x2, y1, z).setColor(argb).setLight(light);
-        consumer.addVertex(matrix, x2, y2, z).setColor(argb).setLight(light);
-        consumer.addVertex(matrix, x1, y2, z).setColor(argb).setLight(light);
+        consumer.vertex(matrix, x1, y1, z).color(argb).uv2(light).endVertex();
+        consumer.vertex(matrix, x2, y1, z).color(argb).uv2(light).endVertex();
+        consumer.vertex(matrix, x2, y2, z).color(argb).uv2(light).endVertex();
+        consumer.vertex(matrix, x1, y2, z).color(argb).uv2(light).endVertex();
     }
 }

@@ -64,11 +64,14 @@ public final class OpenedShulkerCache {
             CACHE.remove(pos);
             NAMES.remove(pos);
         });
-        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
-            CACHE.clear();
-            NAMES.clear();
-            ShulkerSummary.serverSyncSeen = false;
-        });
+        ClientPlayConnectionEvents.INIT.register((handler, client) -> clear());
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> clear());
+    }
+
+    private static void clear() {
+        CACHE.clear();
+        NAMES.clear();
+        ShulkerSummary.serverSyncSeen = false;
     }
 
     private static ShulkerSummary summarize(ShulkerBoxMenu menu) {

@@ -21,12 +21,13 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    // Alloy UI, bundled inside the jar (jar-in-jar). Client code only (the settings screen).
+    // Alloy UI, bundled inside the jar (jar-in-jar). Client code only (the settings screen, the preview panel).
     modImplementation "dev.steelaspect:alloy-ui:${project.alloyui_version}"
     include "dev.steelaspect:alloy-ui:${project.alloyui_version}"
 
     // Optional: Mod Menu's config button opens the settings screen.
-    modCompileOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
+    // (Mod Menu 9.2.0 pulls a placeholder-api build no repo serves, hence transitive = false)
+    modCompileOnly("com.terraformersmc:modmenu:${project.modmenu_version}") { transitive = false }
 
     // -PwithObe=<path to Optimized Block Entities jar>: test placed labels with a mod that draws closed shulkers itself
     if (project.hasProperty('withObe')) {
@@ -38,15 +39,31 @@ dependencies {
     }
 }
 
-// In-game client tests (src/gametest), run with ./gradlew runClientGameTest. Not part of the mod jar.
-fabricApi {
-    configureTests {
-        createSourceSet = true
-        modId = 'cytra-shulkerview-test'
-        enableGameTests = false
-        enableClientGameTests = true
-        eula = true
-        clearRunDirectory = true
+// Client game tests need fabric-client-gametest-api-v1 (1.21.4+): not on 1.20.4 (src/gametest dropped on this branch).
+// Instead src/smoketest is a small client mod run by ./smoketest.sh (through ./headless.sh): it joins a dedicated
+// 1.20.4 server running the built jar, then one without the mod, checks overlays, previews and keys, and logs
+// [ShulkerSmoke] PASS/FAIL.
+sourceSets {
+    smoketest {
+        compileClasspath += main.compileClasspath + main.output
+        runtimeClasspath += main.runtimeClasspath + main.output
+    }
+}
+loom {
+    mods {
+        'cytra-shulkerview' { sourceSet sourceSets.main }
+        'cytra-shulkerview-smoke' { sourceSet sourceSets.smoketest }
+    }
+    runs {
+        smokeTest {
+            client()
+            name 'Smoke test'
+            source sourceSets.smoketest
+            runDir 'build/run/smoke'
+            vmArg '-Dshulkerview.smoke=true'
+            programArgs '--username', 'ShulkerSmoke'
+            ideConfigGenerated false
+        }
     }
 }
 
@@ -60,22 +77,18 @@ processResources {
 
 tasks.withType(JavaCompile).configureEach {
     it.options.encoding = 'UTF-8'
-    it.options.release = 21
+    it.options.release = 17
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
-// Test games start muted. -PalloyPack=<Alloy Pack zip> runs the named shulker texture test; -PnamedOnly skips the rest.
-tasks.matching { it.name == 'runClientGameTest' }.configureEach {
-    if (project.hasProperty('alloyPack')) jvmArgs "-Dshulkerview.alloyPack=${file(project.property('alloyPack'))}"
-    if (project.hasProperty('namedOnly')) jvmArgs '-Dshulkerview.namedOnly=true'
-    // -Ponly=preview|settings|view|named|vanilla runs one test
-    if (project.hasProperty('only')) jvmArgs "-Dshulkerview.only=${project.property('only')}"
+// Test games start muted.
+tasks.matching { it.name == 'runSmokeTest' }.configureEach {
     doFirst {
-        def options = file('build/run/clientGameTest/options.txt')
+        def options = file('build/run/smoke/options.txt')
         options.parentFile.mkdirs()
         def lines = options.exists() ? options.readLines().findAll { !it.startsWith('soundCategory_master:') } : []
         options.text = (lines + 'soundCategory_master:0.0').join('\n') + '\n'
