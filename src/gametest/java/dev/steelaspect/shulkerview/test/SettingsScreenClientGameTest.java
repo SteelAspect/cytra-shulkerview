@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 public class SettingsScreenClientGameTest implements FabricClientGameTest {
     private static final Logger LOG = LoggerFactory.getLogger("ShulkerViewTest");
     private static final int SCALE = 2;
-    private static final String[] IDS = {"itemIcon", "itemBar", "itemIconSize", "placedLabels", "placedDistance",
+    private static final String[] IDS = {"itemIcon", "itemBar", "itemIconSize", "mixedIcon", "placedLabels", "placedLabelsLid", "placedDistance",
             "placedIconSize", "namedTextures", "tooltipPreview", "tooltipShiftOnly", "tooltipCompact", "barColor", "fullBarColor"};
 
     @Override

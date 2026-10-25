@@ -7,10 +7,12 @@ move and behave exactly like vanilla.
 
 - **Shulker items** (inventory, hotbar, chests): a small icon of the item inside when every stack is the same
   item (diamonds, spruce logs...), and a fill bar along the bottom. Light blue while filling, green when 100% full (colours can be changed).
-- **Placed shulkers**: the same icon and fill bar as a label on the four side faces (the faces around the lid),
+- **Placed shulkers**: the same icon and fill bar as a label on the four side faces and the lid (the lid label hides
+  while the box is open; can be turned off),
   like an item frame. Faces turned away from you and shulkers further than 24 blocks are skipped.
 
-Mixed shulkers get only the fill bar; empty shulkers get nothing.
+Mixed shulkers get only the fill bar by default, or (setting) their main item or the top four as a 2x2; empty
+shulkers get nothing.
 
 - **Tooltip preview**: hovering a shulker item (inventory, chests, creative) shows all 27 slots as a grid with counts,
   durability bars and glint, tinted to the shulker's colour, instead of vanilla's text list. Options: only while
@@ -43,6 +45,8 @@ One jar, install it on both for the full effect.
 | `itemIcon` | `true` | Icon on shulker items |
 | `itemBar` | `true` | Fill bar on shulker items |
 | `placedLabels` | `true` | Labels on placed shulkers |
+| `mixedIcon` | `NONE` | Mixed shulkers: `NONE`, `MAIN` (most items) or `TOP4` (2x2) |
+| `placedLabelsLid` | `true` | Label on the lid of placed shulkers too |
 | `placedDistance` | `24` | Max label distance in blocks (1-128) |
 | `barColor` | light blue | Fill bar colour while filling (ARGB int) |
 | `fullBarColor` | green | Fill bar colour when 100% full (ARGB int) |
@@ -63,4 +67,4 @@ Needs a Java 21 JDK: `./gradlew build` → `build/libs/cytra-shulkerview-<versio
 `./gradlew runClientGameTest` runs the in-game test (places shulkers, checks sync, takes screenshots).
 Add `-PalloyPack=<Alloy Pack zip>` for the named-shulker test (`-PnamedOnly` runs just that one). A test also plays a
 server without the mod (labels and named textures only after opening). `-PwithSbt=<ShulkerBoxTooltip jar>` runs the tests
-with ShulkerBoxTooltip loaded. `-Ponly=preview|settings|view|named|vanilla` runs one test.
+with ShulkerBoxTooltip loaded. `-Ponly=preview|settings|view|named|vanilla|mixed` runs one test.

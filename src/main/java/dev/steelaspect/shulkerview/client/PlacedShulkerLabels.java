@@ -62,10 +62,13 @@ public final class PlacedShulkerLabels {
     private PlacedShulkerLabels() {}
 
     static final class Label {
-        final ItemStackRenderState item = new ItemStackRenderState();
+        final ItemStackRenderState[] items = {new ItemStackRenderState(), new ItemStackRenderState(),
+                new ItemStackRenderState(), new ItemStackRenderState()};
         BlockPos pos = BlockPos.ZERO;
         Direction facing = Direction.UP;
-        boolean hasIcon;
+        int icons;
+        /** Lid open or moving: no label on the lid face. */
+        boolean lidOpen;
         float iconScale;
         float fill;
         int barColor;
@@ -133,7 +136,9 @@ public final class PlacedShulkerLabels {
             Label label = LABELS.get(labelCount++);
             label.pos = pos;
             label.facing = shulker.getBlockState().getValueOrElse(ShulkerBoxBlock.FACING, Direction.UP);
-            label.hasIcon = summary.hasIcon();
+            label.lidOpen = shulker.getAnimationStatus() != ShulkerBoxBlockEntity.AnimationStatus.CLOSED || shulker.getProgress(1f) > 0f;
+            java.util.List<net.minecraft.world.item.ItemStack> icons = summary.icons(config.mixedIcon);
+            label.icons = Math.min(icons.size(), label.items.length);
             label.iconScale = (float) config.placedIconSize;
             label.fill = summary.fill();
             label.barColor = ShulkerItems.barColor(summary);
@@ -141,11 +146,13 @@ public final class PlacedShulkerLabels {
                 // Light where the label is: in front of the face (the shulker block itself is dark inside).
                 label.faceLight[face.ordinal()] = LevelRenderer.getLightColor(level, pos.relative(face));
             }
-            if (label.hasIcon) {
-                Minecraft.getInstance().getItemModelResolver()
-                        .updateForTopItem(label.item, summary.icon(), ItemDisplayContext.FIXED, level, null, (int) pos.asLong());
-            } else {
-                label.item.clear();
+            for (int k = 0; k < label.items.length; k++) {
+                if (k < label.icons) {
+                    Minecraft.getInstance().getItemModelResolver()
+                            .updateForTopItem(label.items[k], icons.get(k), ItemDisplayContext.FIXED, level, null, (int) pos.asLong() + k);
+                } else {
+                    label.items[k].clear();
+                }
             }
         }
     }
@@ -160,17 +167,27 @@ public final class PlacedShulkerLabels {
             Vec3 toCamera = cameraPos.subtract(center);
             poseStack.pushPose();
             poseStack.translate(label.pos.getX() - cameraPos.x, label.pos.getY() - cameraPos.y, label.pos.getZ() - cameraPos.z);
+            boolean lid = ShulkerViewConfig.INSTANCE.placedLabelsLid && !label.lidOpen;
             for (Direction face : Direction.values()) {
-                if (face.getAxis() == label.facing.getAxis()) continue;
+                // The bottom never gets one; the lid only when that's on and the box is shut (it would float otherwise).
+                if (face == label.facing.getOpposite() || (face == label.facing && !lid)) continue;
                 // Skip faces turned away from the camera.
                 if (toCamera.x * face.getStepX() + toCamera.y * face.getStepY() + toCamera.z * face.getStepZ() <= 0.5) continue;
-                submitFace(label, face, label.faceLight[face.ordinal()], poseStack, collector);
+                Vector3f target;
+                if (face == label.facing && face.getAxis().isVertical()) {
+                    // Lid facing up or down: read it upright from where the player stands (snapped to a side).
+                    target = Direction.getApproximateNearest(-toCamera.x, 0, -toCamera.z).step();
+                } else {
+                    // Sides read upright; a sideways box's top and bottom faces point toward its lid.
+                    target = face.getAxis().isVertical() ? label.facing.step() : new Vector3f(0, 1, 0);
+                }
+                submitFace(label, face, target, label.faceLight[face.ordinal()], poseStack, collector);
             }
             poseStack.popPose();
         }
     }
 
-    private static void submitFace(Label label, Direction face, int light, PoseStack poseStack, SubmitNodeCollector collector) {
+    private static void submitFace(Label label, Direction face, Vector3f target, int light, PoseStack poseStack, SubmitNodeCollector collector) {
         poseStack.pushPose();
         poseStack.translate(0.5f + face.getStepX() * FACE_OFFSET, 0.5f + face.getStepY() * FACE_OFFSET, 0.5f + face.getStepZ() * FACE_OFFSET);
 
@@ -181,20 +198,29 @@ public final class PlacedShulkerLabels {
         } else {
             rotation.mul(Axis.XP.rotationDegrees(-90.0f * face.getAxisDirection().getStep())).mul(Axis.YP.rotationDegrees(180.0f));
         }
-        // Turn the label so its top points up (or, on a sideways shulker's top/bottom face, toward the lid).
-        Vector3f target = face.getAxis().isVertical() ? label.facing.step() : new Vector3f(0, 1, 0);
+        // Turn the label so its top points at target.
         Vector3f up = rotation.transform(new Vector3f(0, 1, 0));
         Vector3f normal = rotation.transform(new Vector3f(0, 0, 1));
         float angle = (float) Math.atan2(new Vector3f(up).cross(target).dot(normal), up.dot(target));
         rotation.mul(Axis.ZP.rotation(angle));
         poseStack.mulPose(rotation);
 
-        if (label.hasIcon) {
+        if (label.icons == 1) {
             poseStack.pushPose();
             poseStack.translate(0.0f, ICON_Y, 0.0f);
             poseStack.scale(label.iconScale, label.iconScale, label.iconScale);
-            label.item.submit(poseStack, collector, light, OverlayTexture.NO_OVERLAY, 0);
+            label.items[0].submit(poseStack, collector, light, OverlayTexture.NO_OVERLAY, 0);
             poseStack.popPose();
+        } else if (label.icons > 1) {
+            // 2x2 above the bar, most items top-left as seen from outside (local +X is the viewer's left).
+            float step = label.iconScale * 0.5f, half = label.iconScale * 0.45f;
+            for (int k = 0; k < label.icons; k++) {
+                poseStack.pushPose();
+                poseStack.translate((k % 2 == 0 ? 1 : -1) * step / 2f * 1.1f, ICON_Y + (k < 2 ? 1 : -1) * step / 2f * 1.1f, 0.0f);
+                poseStack.scale(half, half, half);
+                label.items[k].submit(poseStack, collector, light, OverlayTexture.NO_OVERLAY, 0);
+                poseStack.popPose();
+            }
         }
 
         float fill = label.fill;

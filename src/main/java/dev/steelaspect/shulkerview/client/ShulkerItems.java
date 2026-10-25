@@ -9,6 +9,8 @@ import net.minecraft.world.level.block.ShulkerBoxBlock;
 import org.jspecify.annotations.Nullable;
 
 final class ShulkerItems {
+    private static final java.util.Map<ItemContainerContents, ShulkerSummary> CACHE = new java.util.WeakHashMap<>();
+
     private ShulkerItems() {}
 
     /** Summary of a shulker box item's contents, or null if the stack isn't a shulker box. */
@@ -17,7 +19,8 @@ final class ShulkerItems {
             return null;
         }
         ItemContainerContents contents = stack.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY);
-        return ShulkerSummary.of(contents.nonEmptyItems());
+        // Contents are immutable and compare by value, so equal boxes share one summary across frames.
+        return CACHE.computeIfAbsent(contents, c -> ShulkerSummary.of(c.nonEmptyItems()));
     }
 
     /** Configured colours: filling (light blue by default) or full (green by default). Always opaque. */

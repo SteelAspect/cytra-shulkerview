@@ -25,6 +25,8 @@ public final class ShulkerViewConfig {
     public boolean itemBar = true;
     /** Icon + fill bar on the side faces of placed shulkers. */
     public boolean placedLabels = true;
+    /** Placed labels on the lid too (hidden while the box is open). */
+    public boolean placedLabelsLid = true;
     /** Placed labels are only drawn within this many blocks. */
     public int placedDistance = 24;
     /** Fill bar colour while the shulker is filling (ARGB). */
@@ -37,6 +39,8 @@ public final class ShulkerViewConfig {
     public double placedIconSize = 0.4;
     /** Placed shulkers named Trash / Tools / Food / Blocks use the Alloy Pack texture for that name (if the pack is on). */
     public boolean namedTextures = true;
+    /** Mixed shulkers (more than one item type): no icon, the main item, or the top four as a 2x2. */
+    public dev.steelaspect.shulkerview.ShulkerSummary.MixedIcon mixedIcon = dev.steelaspect.shulkerview.ShulkerSummary.MixedIcon.NONE;
     /** Hovering a shulker item shows its 27 slots as a grid instead of vanilla's text list. */
     public boolean tooltipPreview = true;
     /** The grid only while Shift is held (vanilla's list otherwise). */
@@ -53,6 +57,7 @@ public final class ShulkerViewConfig {
                 LOGGER.warn("Could not read {}, using defaults", FILE, e);
             }
         }
+        if (INSTANCE.mixedIcon == null) INSTANCE.mixedIcon = dev.steelaspect.shulkerview.ShulkerSummary.MixedIcon.NONE;
         INSTANCE.placedDistance = Math.max(1, Math.min(128, INSTANCE.placedDistance));
         INSTANCE.itemIconSize = Math.max(0.25, Math.min(1.0, INSTANCE.itemIconSize));
         INSTANCE.placedIconSize = Math.max(0.2, Math.min(0.8, INSTANCE.placedIconSize));

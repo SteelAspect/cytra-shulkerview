@@ -16,6 +16,10 @@ public final class ShulkerViewOptions {
         o.section("section.items")
                 .toggle("itemIcon", () -> c().itemIcon, v -> c().itemIcon = v, true).onChange(ShulkerViewConfig::save)
                 .toggle("itemBar", () -> c().itemBar, v -> c().itemBar = v, true).onChange(ShulkerViewConfig::save)
+                .choice("mixedIcon", () -> java.util.List.of(dev.steelaspect.shulkerview.ShulkerSummary.MixedIcon.values()),
+                        v -> Component.translatable("cytra-shulkerview.option.mixedIcon." + v.name().toLowerCase(java.util.Locale.ROOT)),
+                        () -> c().mixedIcon, v -> c().mixedIcon = v, dev.steelaspect.shulkerview.ShulkerSummary.MixedIcon.NONE)
+                .onChange(ShulkerViewConfig::save)
                 .slider("itemIconSize", 0.25, 1.0, 0.05, () -> c().itemIconSize, v -> c().itemIconSize = v, 0.625)
                 .onChange(ShulkerViewConfig::save);
         o.section("section.tooltip")
@@ -27,6 +31,7 @@ public final class ShulkerViewOptions {
                 .disabledWhen(() -> ShulkerPreview.otherModPreviews() || !c().tooltipPreview, Component.translatable("cytra-shulkerview.option.tooltipPreview.off"));
         o.section("section.placed")
                 .toggle("placedLabels", () -> c().placedLabels, v -> c().placedLabels = v, true).onChange(ShulkerViewConfig::save)
+                .toggle("placedLabelsLid", () -> c().placedLabelsLid, v -> c().placedLabelsLid = v, true).onChange(ShulkerViewConfig::save)
                 .number("placedDistance", 1, 128, 1, true, () -> c().placedDistance, v -> c().placedDistance = v.intValue(), 24)
                 .onChange(ShulkerViewConfig::save)
                 .slider("placedIconSize", 0.2, 0.8, 0.05, () -> c().placedIconSize, v -> c().placedIconSize = v, 0.4)
