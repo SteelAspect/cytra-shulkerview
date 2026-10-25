@@ -39,6 +39,8 @@ public final class ShulkerViewOptions {
                 .disabledWhen(ShulkerViewOptions::previewOff, Component.translatable("cytra-shulkerview.option.tooltipPreview.off"))
                 .toggle("tooltipOtherContainers", () -> c().tooltipOtherContainers, v -> c().tooltipOtherContainers = v, true)
                 .onChange(ShulkerViewConfig::save)
+                .disabledWhen(ShulkerViewOptions::previewOff, Component.translatable("cytra-shulkerview.option.tooltipPreview.off"))
+                .toggle("tooltipEnderChest", () -> c().tooltipEnderChest, v -> c().tooltipEnderChest = v, true).onChange(ShulkerViewConfig::save)
                 .disabledWhen(ShulkerViewOptions::previewOff, Component.translatable("cytra-shulkerview.option.tooltipPreview.off"));
         o.section("section.placed")
                 .toggle("placedLabels", () -> c().placedLabels, v -> c().placedLabels = v, true).onChange(ShulkerViewConfig::save)

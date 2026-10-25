@@ -53,6 +53,8 @@ public final class ShulkerViewConfig {
     public boolean tooltipTint = true;
     /** Preview chests, barrels, hoppers, furnaces, ... items that hold items (e.g. Ctrl+pick block in creative). */
     public boolean tooltipOtherContainers = true;
+    /** Ender chest items preview the player's own ender chest (sent by the server, or remembered from opening it). */
+    public boolean tooltipEnderChest = true;
     /** Config layout version, for one-time default changes. */
     public int version = 0;
 

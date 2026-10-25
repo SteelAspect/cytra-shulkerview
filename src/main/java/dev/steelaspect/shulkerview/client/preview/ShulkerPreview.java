@@ -1,5 +1,6 @@
 package dev.steelaspect.shulkerview.client.preview;
 
+import dev.steelaspect.shulkerview.client.EnderChestCache;
 import dev.steelaspect.shulkerview.client.ShulkerViewConfig;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,6 +25,7 @@ import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.ChiseledBookShelfBlock;
 import net.minecraft.world.level.block.CrafterBlock;
 import net.minecraft.world.level.block.DispenserBlock;
+import net.minecraft.world.level.block.EnderChestBlock;
 import net.minecraft.world.level.block.HopperBlock;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
 import org.jspecify.annotations.Nullable;
@@ -36,6 +38,8 @@ import org.jspecify.annotations.Nullable;
  * hovering the same stack frame after frame allocates nothing.
  */
 public final class ShulkerPreview {
+    /** Dark teal of the ender chest. */
+    private static final int ENDER_TINT = 0xFF3E8C88;
     /** Purple of the plain (undyed) shulker box. */
     private static final int PLAIN_TINT = 0xFF8E6A93;
     private static final boolean OTHER_PREVIEW_MOD = FabricLoader.getInstance().isModLoaded("shulkerboxtooltip");
@@ -60,12 +64,14 @@ public final class ShulkerPreview {
         if (!(stack.getItem() instanceof BlockItem item)) return null;
         Block block = item.getBlock();
         if (block instanceof ShulkerBoxBlock) return block;
+        if (block instanceof EnderChestBlock) return ShulkerViewConfig.INSTANCE.tooltipEnderChest ? block : null;
         return ShulkerViewConfig.INSTANCE.tooltipOtherContainers && slotCount(block) > 0 ? block : null;
     }
 
     /** Slots of the container this block item places (0 = not a container we preview). */
     private static int slotCount(Block block) {
-        if (block instanceof ShulkerBoxBlock || block instanceof ChestBlock || block instanceof BarrelBlock) return 27;
+        if (block instanceof ShulkerBoxBlock || block instanceof ChestBlock || block instanceof BarrelBlock
+                || block instanceof EnderChestBlock) return 27;
         if (block instanceof DispenserBlock || block instanceof CrafterBlock) return 9; // dropper too
         if (block instanceof HopperBlock || block instanceof BrewingStandBlock) return 5;
         if (block instanceof AbstractFurnaceBlock) return 3;
@@ -74,13 +80,16 @@ public final class ShulkerPreview {
     }
 
     private static int tint(Block block) {
-        if (!(block instanceof ShulkerBoxBlock box) || !ShulkerViewConfig.INSTANCE.tooltipTint) return 0;
+        if (!ShulkerViewConfig.INSTANCE.tooltipTint) return 0;
+        if (block instanceof EnderChestBlock) return ENDER_TINT;
+        if (!(block instanceof ShulkerBoxBlock box)) return 0;
         DyeColor color = box.getColor();
         return color == null ? PLAIN_TINT : color.getTextureDiffuseColor() | 0xFF000000;
     }
 
     private static @Nullable ItemContainerContents contents(ItemStack stack) {
-        ItemContainerContents contents = stack.get(DataComponents.CONTAINER);
+        boolean ender = stack.getItem() instanceof BlockItem item && item.getBlock() instanceof EnderChestBlock;
+        ItemContainerContents contents = ender ? EnderChestCache.contents() : stack.get(DataComponents.CONTAINER);
         return contents != null && contents.nonEmptyItems().iterator().hasNext() ? contents : null;
     }
 

@@ -1,6 +1,6 @@
 package dev.steelaspect.shulkerview.test;
 
-/** -Ponly=<name> runs just that test (preview, settings, view, named, vanilla, mixed). */
+/** -Ponly=<name> runs just that test (preview, settings, view, named, vanilla, mixed, ender). */
 final class Only {
     private Only() {}
 

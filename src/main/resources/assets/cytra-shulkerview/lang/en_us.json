@@ -51,5 +51,7 @@
   "cytra-shulkerview.tooltip.alt_shift": "Alt+Shift: %s",
   "cytra-shulkerview.tooltip.alt": "Alt: %s",
   "cytra-shulkerview.tooltip.full": "every slot",
-  "cytra-shulkerview.tooltip.compact": "compact"
+  "cytra-shulkerview.tooltip.compact": "compact",
+  "cytra-shulkerview.option.tooltipEnderChest": "Ender chest",
+  "cytra-shulkerview.option.tooltipEnderChest.hint": "Ender chest items preview your own ender chest. Needs this mod on the server, or opening your ender chest once"
 }

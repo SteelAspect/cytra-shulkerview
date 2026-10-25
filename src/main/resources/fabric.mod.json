@@ -13,6 +13,7 @@
   "icon": "assets/cytra-shulkerview/icon.png",
   "environment": "*",
   "entrypoints": {
+    "main": ["dev.steelaspect.shulkerview.ShulkerView"],
     "client": ["dev.steelaspect.shulkerview.client.ShulkerViewClient"],
     "modmenu": ["dev.steelaspect.shulkerview.client.compat.ModMenuIntegration"]
   },

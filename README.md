@@ -17,8 +17,9 @@ shulkers get nothing.
 - **Tooltip preview** (works like ShulkerBoxTooltip): hovering a shulker item says "Shift: preview". Hold Shift for
   the compact view (same items merged, most first), Alt+Shift for the full view (every stack in its slot). The window
   looks like a vanilla container, tinted with the shulker's colour (or the dark Alloy panel), with counts, durability
-  bars and glint. Chests, barrels, hoppers, furnaces and dispensers that hold items preview too. Turned off when
-  ShulkerBoxTooltip is installed.
+  bars and glint. Chests, barrels, hoppers, furnaces and dispensers that hold items preview too, and ender chest items
+  preview your own ender chest (sent by the server when it has this mod, otherwise remembered once you open it).
+  Turned off when ShulkerBoxTooltip is installed.
 
 - **Named shulkers** (with Alloy Pack on): placed shulkers named `Trash`, `Tools`, `Food` or `Blocks` (any case) use
   the same texture Alloy Pack gives the item. Without the pack they look vanilla. With Optimized Block Entities these
@@ -61,6 +62,7 @@ One jar, install it on both for the full effect.
 | `tooltipStyle` | `VANILLA` | Preview window look: `VANILLA` or `ALLOY` |
 | `tooltipTint` | `true` | Shulker previews take the box's colour |
 | `tooltipOtherContainers` | `true` | Also preview chests, barrels, hoppers, furnaces, dispensers |
+| `tooltipEnderChest` | `true` | Ender chest items preview your ender chest |
 
 All of these are also in the mod's own settings screen (Mod Menu's config button, or bind "Open settings" under
 Controls → Alloy Shulker View; no key by default) and on the Shulker View page in Alloy Hub. The screen uses Alloy UI
@@ -72,4 +74,4 @@ Needs a Java 21 JDK: `./gradlew build` → `build/libs/cytra-shulkerview-<versio
 `./gradlew runClientGameTest` runs the in-game test (places shulkers, checks sync, takes screenshots).
 Add `-PalloyPack=<Alloy Pack zip>` for the named-shulker test (`-PnamedOnly` runs just that one). A test also plays a
 server without the mod (labels and named textures only after opening). `-PwithSbt=<ShulkerBoxTooltip jar>` runs the tests
-with ShulkerBoxTooltip loaded. `-Ponly=preview|settings|view|named|vanilla|mixed` runs one test.
+with ShulkerBoxTooltip loaded. `-Ponly=preview|settings|view|named|vanilla|mixed|ender` runs one test.
