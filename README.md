@@ -14,9 +14,11 @@ move and behave exactly like vanilla.
 Mixed shulkers get only the fill bar by default, or (setting) their main item or the top four as a 2x2; empty
 shulkers get nothing.
 
-- **Tooltip preview**: hovering a shulker item (inventory, chests, creative) shows all 27 slots as a grid with counts,
-  durability bars and glint, tinted to the shulker's colour, instead of vanilla's text list. Options: only while
-  holding Shift, and compact (same items merged with their total). Turned off when ShulkerBoxTooltip is installed.
+- **Tooltip preview** (works like ShulkerBoxTooltip): hovering a shulker item says "Shift: preview". Hold Shift for
+  the compact view (same items merged, most first), Alt+Shift for the full view (every stack in its slot). The window
+  looks like a vanilla container, tinted with the shulker's colour (or the dark Alloy panel), with counts, durability
+  bars and glint. Chests, barrels, hoppers, furnaces and dispensers that hold items preview too. Turned off when
+  ShulkerBoxTooltip is installed.
 
 - **Named shulkers** (with Alloy Pack on): placed shulkers named `Trash`, `Tools`, `Food` or `Blocks` (any case) use
   the same texture Alloy Pack gives the item. Without the pack they look vanilla. With Optimized Block Entities these
@@ -53,9 +55,12 @@ One jar, install it on both for the full effect.
 | `itemIconSize` | `0.625` | Icon size on items, fraction of the slot (0.25-1) |
 | `placedIconSize` | `0.4` | Icon size on placed labels, fraction of the face (0.2-0.8) |
 | `namedTextures` | `true` | Alloy Pack textures on placed shulkers named Trash / Tools / Food / Blocks |
-| `tooltipPreview` | `true` | Slot-grid preview in shulker item tooltips |
-| `tooltipShiftOnly` | `false` | Preview only while Shift is held |
-| `tooltipCompact` | `false` | Preview merges same items into one slot with the total |
+| `tooltipPreview` | `true` | Contents preview in container item tooltips |
+| `tooltipShiftOnly` | `true` | Preview only while Shift is held (a hint line otherwise) |
+| `tooltipCompact` | `true` | Shift shows the compact view (`false`: the full view); Alt+Shift shows the other |
+| `tooltipStyle` | `VANILLA` | Preview window look: `VANILLA` or `ALLOY` |
+| `tooltipTint` | `true` | Shulker previews take the box's colour |
+| `tooltipOtherContainers` | `true` | Also preview chests, barrels, hoppers, furnaces, dispensers |
 
 All of these are also in the mod's own settings screen (Mod Menu's config button, or bind "Open settings" under
 Controls → Alloy Shulker View; no key by default) and on the Shulker View page in Alloy Hub. The screen uses Alloy UI

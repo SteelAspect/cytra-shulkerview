@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/** Leaves out vanilla's "Item x 3" lines when the preview grid shows them; adds a Shift hint in Shift-only mode. */
+/** Swaps vanilla's "Item x 3" lines for the preview's hint line (Shift: preview / Alt+Shift: full) on previewed items. */
 @Mixin(ItemStack.class)
 public abstract class ItemStackTooltipMixin {
     @Inject(method = "addToTooltip", at = @At("HEAD"), cancellable = true)
@@ -23,11 +23,9 @@ public abstract class ItemStackTooltipMixin {
                                 Consumer<Component> lines, TooltipFlag flag, CallbackInfo ci) {
         if (type != DataComponents.CONTAINER) return;
         ItemStack self = (ItemStack) (Object) this;
-        if (ShulkerPreview.replacesList(self)) {
-            ci.cancel();
-        } else if (ShulkerPreview.wantsShiftHint(self)) {
-            // Vanilla's list still goes in (this method carries on); the hint comes right before it.
-            lines.accept(Component.translatable("cytra-shulkerview.tooltip.shift").withStyle(ChatFormatting.DARK_GRAY));
-        }
+        if (!ShulkerPreview.replacesList(self)) return;
+        Component hint = ShulkerPreview.hint(self);
+        if (hint != null) lines.accept(hint.copy().withStyle(ChatFormatting.GRAY));
+        ci.cancel();
     }
 }

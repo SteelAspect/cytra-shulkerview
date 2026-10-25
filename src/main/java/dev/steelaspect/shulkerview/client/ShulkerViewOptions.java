@@ -25,10 +25,21 @@ public final class ShulkerViewOptions {
         o.section("section.tooltip")
                 .toggle("tooltipPreview", () -> c().tooltipPreview, v -> c().tooltipPreview = v, true).onChange(ShulkerViewConfig::save)
                 .disabledWhen(ShulkerPreview::otherModPreviews, Component.translatable("cytra-shulkerview.option.tooltipPreview.other"))
-                .toggle("tooltipShiftOnly", () -> c().tooltipShiftOnly, v -> c().tooltipShiftOnly = v, false).onChange(ShulkerViewConfig::save)
-                .disabledWhen(() -> ShulkerPreview.otherModPreviews() || !c().tooltipPreview, Component.translatable("cytra-shulkerview.option.tooltipPreview.off"))
-                .toggle("tooltipCompact", () -> c().tooltipCompact, v -> c().tooltipCompact = v, false).onChange(ShulkerViewConfig::save)
-                .disabledWhen(() -> ShulkerPreview.otherModPreviews() || !c().tooltipPreview, Component.translatable("cytra-shulkerview.option.tooltipPreview.off"));
+                .toggle("tooltipShiftOnly", () -> c().tooltipShiftOnly, v -> c().tooltipShiftOnly = v, true).onChange(ShulkerViewConfig::save)
+                .disabledWhen(ShulkerViewOptions::previewOff, Component.translatable("cytra-shulkerview.option.tooltipPreview.off"))
+                .choice("tooltipCompact", () -> java.util.List.of(true, false),
+                        v -> Component.translatable("cytra-shulkerview.option.tooltipCompact." + (v ? "compact" : "full")),
+                        () -> c().tooltipCompact, v -> c().tooltipCompact = v, true).onChange(ShulkerViewConfig::save)
+                .disabledWhen(ShulkerViewOptions::previewOff, Component.translatable("cytra-shulkerview.option.tooltipPreview.off"))
+                .choice("tooltipStyle", () -> java.util.List.of(ShulkerViewConfig.TooltipStyle.values()),
+                        v -> Component.translatable("cytra-shulkerview.option.tooltipStyle." + v.name().toLowerCase(java.util.Locale.ROOT)),
+                        () -> c().tooltipStyle, v -> c().tooltipStyle = v, ShulkerViewConfig.TooltipStyle.VANILLA).onChange(ShulkerViewConfig::save)
+                .disabledWhen(ShulkerViewOptions::previewOff, Component.translatable("cytra-shulkerview.option.tooltipPreview.off"))
+                .toggle("tooltipTint", () -> c().tooltipTint, v -> c().tooltipTint = v, true).onChange(ShulkerViewConfig::save)
+                .disabledWhen(ShulkerViewOptions::previewOff, Component.translatable("cytra-shulkerview.option.tooltipPreview.off"))
+                .toggle("tooltipOtherContainers", () -> c().tooltipOtherContainers, v -> c().tooltipOtherContainers = v, true)
+                .onChange(ShulkerViewConfig::save)
+                .disabledWhen(ShulkerViewOptions::previewOff, Component.translatable("cytra-shulkerview.option.tooltipPreview.off"));
         o.section("section.placed")
                 .toggle("placedLabels", () -> c().placedLabels, v -> c().placedLabels = v, true).onChange(ShulkerViewConfig::save)
                 .toggle("placedLabelsLid", () -> c().placedLabelsLid, v -> c().placedLabelsLid = v, true).onChange(ShulkerViewConfig::save)
@@ -42,6 +53,10 @@ public final class ShulkerViewOptions {
                 .color("fullBarColor", () -> c().fullBarColor, v -> c().fullBarColor = v, 0xFF55FF55, true)
                 .onChange(ShulkerViewConfig::save);
         return o;
+    }
+
+    private static boolean previewOff() {
+        return ShulkerPreview.otherModPreviews() || !c().tooltipPreview;
     }
 
     private static ShulkerViewConfig c() {

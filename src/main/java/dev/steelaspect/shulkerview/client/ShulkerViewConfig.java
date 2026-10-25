@@ -41,12 +41,22 @@ public final class ShulkerViewConfig {
     public boolean namedTextures = true;
     /** Mixed shulkers (more than one item type): no icon, the main item, or the top four as a 2x2. */
     public dev.steelaspect.shulkerview.ShulkerSummary.MixedIcon mixedIcon = dev.steelaspect.shulkerview.ShulkerSummary.MixedIcon.NONE;
-    /** Hovering a shulker item shows its 27 slots as a grid instead of vanilla's text list. */
+    /** Hovering a container item (shulker, chest, ...) can show its contents as a slot grid instead of vanilla's list. */
     public boolean tooltipPreview = true;
-    /** The grid only while Shift is held (vanilla's list otherwise). */
-    public boolean tooltipShiftOnly = false;
-    /** The grid merges same items into one slot with the total, most first. */
-    public boolean tooltipCompact = false;
+    /** The preview only while Shift is held (like ShulkerBoxTooltip); a hint line otherwise. */
+    public boolean tooltipShiftOnly = true;
+    /** Shift shows the compact view (same items merged, most first); Alt+Shift the full one. False swaps them. */
+    public boolean tooltipCompact = true;
+    /** Look of the preview window. */
+    public TooltipStyle tooltipStyle = TooltipStyle.VANILLA;
+    /** Shulker previews take the box's colour. */
+    public boolean tooltipTint = true;
+    /** Preview chests, barrels, hoppers, furnaces, ... items that hold items (e.g. Ctrl+pick block in creative). */
+    public boolean tooltipOtherContainers = true;
+    /** Config layout version, for one-time default changes. */
+    public int version = 0;
+
+    public enum TooltipStyle { VANILLA, ALLOY }
 
     public static void load() {
         if (Files.exists(FILE)) {
@@ -57,6 +67,13 @@ public final class ShulkerViewConfig {
                 LOGGER.warn("Could not read {}, using defaults", FILE, e);
             }
         }
+        if (INSTANCE.version < 2) {
+            // 1.6.0: the tooltip preview works like ShulkerBoxTooltip (Shift: compact, Alt+Shift: full).
+            INSTANCE.tooltipShiftOnly = true;
+            INSTANCE.tooltipCompact = true;
+            INSTANCE.version = 2;
+        }
+        if (INSTANCE.tooltipStyle == null) INSTANCE.tooltipStyle = TooltipStyle.VANILLA;
         if (INSTANCE.mixedIcon == null) INSTANCE.mixedIcon = dev.steelaspect.shulkerview.ShulkerSummary.MixedIcon.NONE;
         INSTANCE.placedDistance = Math.max(1, Math.min(128, INSTANCE.placedDistance));
         INSTANCE.itemIconSize = Math.max(0.25, Math.min(1.0, INSTANCE.itemIconSize));

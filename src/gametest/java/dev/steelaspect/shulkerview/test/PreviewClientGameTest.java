@@ -24,8 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Tooltip preview: the grid replaces vanilla's text list (name kept), compact mode, Shift only, and a shulker inside a
- * chest. Screenshots of each with the mouse over the shulker.
+ * Tooltip preview, ShulkerBoxTooltip style: hint without Shift, compact with Shift, full with Alt+Shift, Alloy look,
+ * a chest item, always-on mode, and a shulker inside a chest. Screenshots with the mouse over the item.
  */
 public class PreviewClientGameTest implements FabricClientGameTest {
     private static final Logger LOG = LoggerFactory.getLogger("ShulkerViewTest");
@@ -52,39 +52,56 @@ public class PreviewClientGameTest implements FabricClientGameTest {
                     + "{slot:26,item:{id:\"minecraft:gold_nugget\",count:40}}]]");
             context.waitTicks(5);
 
-            // Lines: name kept, vanilla's "x 3" list gone; image is the grid.
+            world.getServer().runCommand("give @p minecraft:chest[container=[{slot:0,item:{id:\"minecraft:iron_ingot\",count:32}},"
+                    + "{slot:5,item:{id:\"minecraft:bread\",count:12}},{slot:20,item:{id:\"minecraft:iron_ingot\",count:64}}]]");
+            context.waitTicks(5);
+
+            // Default (like ShulkerBoxTooltip): name + "Shift: preview" hint, no vanilla list, no window.
             context.runOnClient(c -> {
                 ItemStack stack = c.player.getInventory().getItem(0);
-                List<Component> lines = stack.getTooltipLines(Item.TooltipContext.of(c.level), c.player, TooltipFlag.NORMAL);
-                String all = lines.stream().map(Component::getString).reduce("", (a, b) -> a + "|" + b);
-                check(all.contains("Loot"), "custom name kept: " + all);
-                check(!all.contains("Gold Nugget"), "vanilla list replaced: " + all);
-                Optional<TooltipComponent> image = stack.getTooltipImage();
-                check(image.isPresent() && image.get().getClass().getSimpleName().equals("ShulkerPreviewData"), "grid image");
-                check(stack.getTooltipImage().get() == image.get(), "same image reused next frame (cached)");
+                String all = lines(c, stack);
+                check(all.contains("Loot") && all.contains("Shift: preview") && !all.contains("Gold Nugget"), "hint instead of the list: " + all);
+                check(stack.getTooltipImage().isEmpty(), "no window without Shift");
             });
-
             context.runOnClient(c -> c.setScreen(new InventoryScreen(c.player)));
             context.waitTicks(5);
             hoverSlotWith(context, 0);
-            shot(context, "40-preview");
+            shot(context, "40-hint");
 
-            ShulkerViewConfig.INSTANCE.tooltipCompact = true;
-            context.waitTicks(2);
-            shot(context, "41-preview-compact");
-            ShulkerViewConfig.INSTANCE.tooltipCompact = false;
-
-            ShulkerViewConfig.INSTANCE.tooltipShiftOnly = true;
+            // Shift: compact.
+            context.getInput().holdKey(GLFW.GLFW_KEY_LEFT_SHIFT);
             context.waitTicks(2);
             context.runOnClient(c -> {
                 ItemStack stack = c.player.getInventory().getItem(0);
-                String all = stack.getTooltipLines(Item.TooltipContext.of(c.level), c.player, TooltipFlag.NORMAL).stream()
-                        .map(Component::getString).reduce("", (a, b) -> a + "|" + b);
-                check(all.contains("Gold Nugget") && all.contains("Hold Shift"), "Shift only: vanilla list + hint: " + all);
-                check(stack.getTooltipImage().isEmpty(), "Shift only: no grid without Shift");
+                Optional<TooltipComponent> image = stack.getTooltipImage();
+                check(image.isPresent() && image.get().getClass().getSimpleName().equals("ShulkerPreviewData"), "Shift: window");
+                check(stack.getTooltipImage().get() == image.get(), "same window reused next frame (cached)");
+                check(lines(c, stack).contains("Alt+Shift: every slot"), "Shift: hint for the full view");
             });
-            shot(context, "42-preview-shift-only");
+            shot(context, "41-shift-compact");
+
+            // Alt+Shift: full, every stack in its slot.
+            context.getInput().holdKey(GLFW.GLFW_KEY_LEFT_ALT);
+            context.waitTicks(2);
+            shot(context, "42-alt-shift-full");
+            context.getInput().releaseKey(GLFW.GLFW_KEY_LEFT_ALT);
+
+            ShulkerViewConfig.INSTANCE.tooltipStyle = ShulkerViewConfig.TooltipStyle.ALLOY;
+            context.waitTicks(2);
+            shot(context, "43-shift-alloy-style");
+            ShulkerViewConfig.INSTANCE.tooltipStyle = ShulkerViewConfig.TooltipStyle.VANILLA;
+
+            // Other containers: a chest item with contents.
+            hoverSlotWith(context, 1);
+            context.runOnClient(c -> check(c.player.getInventory().getItem(1).getTooltipImage().isPresent(), "chest item previews"));
+            shot(context, "44-chest-item");
+            context.getInput().releaseKey(GLFW.GLFW_KEY_LEFT_SHIFT);
+
+            // Not Shift-only: shown straight away.
             ShulkerViewConfig.INSTANCE.tooltipShiftOnly = false;
+            context.waitTicks(2);
+            context.runOnClient(c -> check(c.player.getInventory().getItem(0).getTooltipImage().isPresent(), "always on: window without Shift"));
+            ShulkerViewConfig.INSTANCE.tooltipShiftOnly = true;
             context.runOnClient(c -> c.setScreen(null));
 
             // A shulker inside a chest.
@@ -104,9 +121,17 @@ public class PreviewClientGameTest implements FabricClientGameTest {
             context.waitTicks(10);
             check(context.computeOnClient(c -> c.screen instanceof ContainerScreen), "chest opened");
             hoverSlotWith(context, 10);
-            shot(context, "43-preview-in-chest");
+            context.getInput().holdKey(GLFW.GLFW_KEY_LEFT_SHIFT);
+            context.waitTicks(2);
+            shot(context, "45-shulker-in-chest");
+            context.getInput().releaseKey(GLFW.GLFW_KEY_LEFT_SHIFT);
             context.runOnClient(c -> c.player.closeContainer());
         }
+    }
+
+    private static String lines(Minecraft c, ItemStack stack) {
+        return stack.getTooltipLines(Item.TooltipContext.of(c.level), c.player, TooltipFlag.NORMAL).stream()
+                .map(Component::getString).reduce("", (x, y) -> x + "|" + y);
     }
 
     /** Moves the mouse over the menu slot with this container index (0 = first slot of the open menu). */
