@@ -9,7 +9,7 @@
     "sources": "https://github.com/SteelAspect/cytra-shulkerview",
     "issues": "https://github.com/SteelAspect/cytra-shulkerview/issues"
   },
-  "license": "All-Rights-Reserved",
+  "license": "MIT",
   "icon": "assets/cytra-shulkerview/icon.png",
   "environment": "*",
   "entrypoints": {
